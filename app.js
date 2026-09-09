@@ -81,10 +81,10 @@ const worlds=document.getElementById("worlds"),modal=document.getElementById("mo
 let game=null,qi=0,correct=0,locked=false;
 
 function render(){
- worlds.innerHTML=sections.map((s,si)=>\`<article class="world" style="--c:\${s.color};--soft:\${s.soft}">
- <div class="world-head"><div class="world-icon">\${s.icon}</div><div><div class="code">\${s.code}</div><h2>\${si+1}. Bölüm · \${s.title}</h2><div>\${s.badge} \${sectionWon(s)?"✅":"🔒"}</div></div></div>
- <div class="intro"><b>Konuyu keşfet</b>\${s.intro}</div>
- <div class="cards">\${s.games.map(g=>\`<button class="card" data-id="\${g.id}" style="--c:\${s.color}"><span class="emoji">\${g.icon}</span><h3>\${g.title}</h3><p>\${g.desc}</p><strong>\${state.wins[g.id]?"Tamamlandı ✓":"Oyunu aç →"}</strong></button>\`).join("")}</div></article>\`).join("");
+ worlds.innerHTML=sections.map((s,si)=>`<article class="world" style="--c:${s.color};--soft:${s.soft}">
+ <div class="world-head"><div class="world-icon">${s.icon}</div><div><div class="code">${s.code}</div><h2>${si+1}. Bölüm · ${s.title}</h2><div>${s.badge} ${sectionWon(s)?"✅":"🔒"}</div></div></div>
+ <div class="intro"><b>Konuyu keşfet</b>${s.intro}</div>
+ <div class="cards">${s.games.map(g=>`<button class="card" data-id="${g.id}" style="--c:${s.color}"><span class="emoji">${g.icon}</span><h3>${g.title}</h3><p>${g.desc}</p><strong>${state.wins[g.id]?"Tamamlandı ✓":"Oyunu aç →"}</strong></button>`).join("")}</div></article>`).join("");
  document.querySelectorAll(".card").forEach(b=>b.onclick=()=>start(findGame(b.dataset.id)));
  updateProgress();
 }
@@ -94,17 +94,17 @@ function updateProgress(){document.getElementById("stars").textContent=state.sco
 function start(g){game=g;qi=0;correct=0;locked=false;modal.hidden=false;document.body.style.overflow="hidden";showQ()}
 function showQ(){
  const q=game.q[qi];locked=false;
- document.getElementById("gameHead").innerHTML=\`<div class="game-title">\${game.icon} \${game.title}</div><div class="game-meta">\${game.section.code} · \${correct*10} puan</div>\`;
+ document.getElementById("gameHead").innerHTML=`<div class="game-title">${game.icon} ${game.title}</div><div class="game-meta">${game.section.code} · ${correct*10} puan</div>`;
  document.getElementById("bar").style.width=(qi/game.q.length*100)+"%";
- document.getElementById("question").innerHTML=\`<div class="qno">GÖREV \${qi+1} / \${game.q.length}</div><div class="prompt">\${q[0]}</div><div class="scene">\${q[1]}</div>\`;
+ document.getElementById("question").innerHTML=`<div class="qno">GÖREV ${qi+1} / ${game.q.length}</div><div class="prompt">${q[0]}</div><div class="scene">${q[1]}</div>`;
  const opts=[...q[3]].sort(()=>Math.random()-.5);
- document.getElementById("answers").innerHTML=opts.map(a=>\`<button class="answer">\${a}</button>\`).join("");
+ document.getElementById("answers").innerHTML=opts.map(a=>`<button class="answer">${a}</button>`).join("");
  document.getElementById("feedback").textContent="";document.getElementById("next").hidden=true;
  document.querySelectorAll(".answer").forEach(b=>b.onclick=()=>answer(b,q[2]));
 }
 function answer(btn,right){if(locked)return;locked=true;document.querySelectorAll(".answer").forEach(b=>{b.disabled=true;if(b.textContent===String(right))b.classList.add("good")});if(btn.textContent===String(right)){correct++;btn.classList.add("good");document.getElementById("feedback").textContent="Harika! Doğru cevap. +10 puan ⭐"}else{btn.classList.add("bad");document.getElementById("feedback").textContent="Birlikte öğrendik! Doğru cevap: "+right}document.getElementById("next").hidden=false}
 document.getElementById("next").onclick=()=>{qi++;if(qi<game.q.length)showQ();else finish()};
-function finish(){const won=correct>=4;if(won&&!state.wins[game.id]){state.wins[game.id]=true;state.score+=correct*10}else if(!state.wins[game.id])state.score+=correct*10;localStorage.setItem("sg-progress",JSON.stringify(state));document.getElementById("bar").style.width="100%";document.getElementById("question").innerHTML=\`<div class="result"><div class="cup">\${won?"🏆":"🌱"}</div><h2>\${won?"Görev tamamlandı!":"Bir kez daha deneyelim!"}</h2><p>5 sorudan \${correct} tanesini doğru cevapladın. \${won?"Bu oyunun yıldızını kazandın!":"4 doğruya ulaştığında oyunu tamamlayacaksın."}</p><button class="play-again" id="again">\${won?"Oyunlara dön":"Yeniden oyna"}</button></div>\`;document.getElementById("answers").innerHTML="";document.getElementById("feedback").textContent="";document.getElementById("next").hidden=true;document.getElementById("again").onclick=()=>won?closeGame():start(game);render()}
+function finish(){const won=correct>=4;if(won&&!state.wins[game.id]){state.wins[game.id]=true;state.score+=correct*10}else if(!state.wins[game.id])state.score+=correct*10;localStorage.setItem("sg-progress",JSON.stringify(state));document.getElementById("bar").style.width="100%";document.getElementById("question").innerHTML=`<div class="result"><div class="cup">${won?"🏆":"🌱"}</div><h2>${won?"Görev tamamlandı!":"Bir kez daha deneyelim!"}</h2><p>5 sorudan ${correct} tanesini doğru cevapladın. ${won?"Bu oyunun yıldızını kazandın!":"4 doğruya ulaştığında oyunu tamamlayacaksın."}</p><button class="play-again" id="again">${won?"Oyunlara dön":"Yeniden oyna"}</button></div>`;document.getElementById("answers").innerHTML="";document.getElementById("feedback").textContent="";document.getElementById("next").hidden=true;document.getElementById("again").onclick=()=>won?closeGame():start(game);render()}
 function closeGame(){modal.hidden=true;document.body.style.overflow="";render()}
 document.getElementById("close").onclick=closeGame;modal.onclick=e=>{if(e.target===modal)closeGame()};
 document.getElementById("reset").onclick=()=>{if(confirm("Tüm puan ve rozetler sıfırlansın mı?")){state={score:0,wins:{}};localStorage.setItem("sg-progress",JSON.stringify(state));render()}};
